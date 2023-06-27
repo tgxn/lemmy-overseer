@@ -45,6 +45,14 @@ class Inbox(Resource):
         self.args = self.post_parser.parse_args()
         json_payload = request.get_json()
         actor = json_payload["actor"]
-        message = json_payload["object"]["content"]
-        logger.info(f"Fediseer Inbox Received: From: {actor} | {message}")
+        if json_payload.get("Type") == "Follow":
+            logger.info(f"Fediseer is now followed from: {actor}")
+        elif json_payload.get("Type") == "Delete":
+            pass
+        else:
+            try:
+                message = json_payload["object"]["content"]
+                logger.info(f"Fediseer Inbox Received: From: {actor} | {message}")
+            except:
+                logger.info(f"Received unexpected invox payload: {json_payload}")
         return {"message": "delivered"}, 200
